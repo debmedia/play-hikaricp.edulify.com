@@ -29,7 +29,7 @@ class HikariCPPlugin(app: Application) extends DBPlugin {
   
   lazy val logger : ALogger = play.Logger.of("com.edulify.play.hikaricp.HikariCPPlugin")
 
-  override def enabled = true
+  override def enabled = app.configuration.getBoolean("hikari.enabled").getOrElse(false)
 
   private lazy val hirakiCPDBApi: DBApi = new HirakiCPDBApi(databaseConfig, app.classloader)
 

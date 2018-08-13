@@ -23,6 +23,10 @@ import java.util.Properties
 
 import org.apache.commons.configuration.{PropertiesConfiguration, ConfigurationConverter}
 import play.Logger.ALogger
+import play.Play
+import play.libs;
+import play.api.libs.Crypto
+import java.lang.Boolean
 
 class HikariCPConfig(dbConfig: Configuration) {
   lazy val DEFAULT_DATASOURCE_NAME = "default"
@@ -41,6 +45,16 @@ class HikariCPConfig(dbConfig: Configuration) {
     var properties = new Properties()
     try {
       properties = ConfigurationConverter.getProperties(new PropertiesConfiguration(file))
+      
+      val isEncrypted = Boolean.parseBoolean(properties.getProperty("isEncrypted","false"))
+      if(isEncrypted){
+        val encryptedPassword = properties.getProperty("password","")
+        val secret= Play.application().configuration().getString("application.secret")        
+        val decryptedPassword = Crypto.decryptAES(encryptedPassword, secret.substring(0, 16));
+        properties.setProperty("password", decryptedPassword)
+      }
+      properties.remove("isEncrypted")
+      
     } catch {
       case ex: IOException =>
         play.api.Logger.warn("Could not read file " + file, ex)
