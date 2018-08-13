@@ -16,17 +16,19 @@
 package com.edulify.play.hikaricp
 
 import com.zaxxer.hikari.HikariConfig
-import play.api.{Configuration, Logger}
+import play.api.{Configuration}
 
 import java.io.{File, FileReader, IOException}
 import java.util.Properties
 
 import org.apache.commons.configuration.{PropertiesConfiguration, ConfigurationConverter}
+import play.Logger.ALogger
 
 class HikariCPConfig(dbConfig: Configuration) {
   lazy val DEFAULT_DATASOURCE_NAME = "default"
   lazy val HIKARI_CP_PROPERTIES_FILE = "hikaricp.properties"
-
+  lazy val logger : ALogger = play.Logger.of("com.edulify.play.hikaricp.HikariCPConfig")
+  
   def getHikariConfig = {
     val file = new File(HIKARI_CP_PROPERTIES_FILE)
     if(file.exists()) new HikariConfig(props(file))
@@ -34,7 +36,7 @@ class HikariCPConfig(dbConfig: Configuration) {
   }
 
   private def props(file: File): Properties = {
-    Logger.info("Loading Hikari configuration from " + file)
+    logger.debug("Loading Hikari configuration from " + file)
 
     var properties = new Properties()
     try {
@@ -44,16 +46,16 @@ class HikariCPConfig(dbConfig: Configuration) {
         play.api.Logger.warn("Could not read file " + file, ex)
     }
 
-    Logger.info("Properties: " + properties)
+    logger.debug("Properties: " + properties)
     properties
   }
 
   private def mapFromPlayConfiguration(): Properties = {
-    Logger.info("Loading Hikari configuration from Play configuration.")
+    logger.debug("Loading Hikari configuration from Play configuration.")
 
     val configFile = dbConfig.getString("hikaricp.file")
     if(configFile.nonEmpty) {
-      Logger.info("Loading from file configured by db.default.hikaricp.file that is " + configFile)
+      logger.debug("Loading from file configured by db.default.hikaricp.file that is " + configFile)
       return props(new File(configFile.get))
     }
 
@@ -73,7 +75,7 @@ class HikariCPConfig(dbConfig: Configuration) {
     properties.setProperty("registerMbeans",    dbConfig.getString("statisticsEnabled").getOrElse("false"))
     properties.setProperty("connectionInitSql", dbConfig.getString("initSQL").get)
 
-    Logger.info("Properties: " + properties)
+    logger.debug("Properties: " + properties)
     properties
   }
 

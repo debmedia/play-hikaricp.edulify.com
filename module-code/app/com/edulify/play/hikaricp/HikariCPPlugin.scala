@@ -21,10 +21,13 @@ import play.api.db.{DBApi, DBPlugin}
 import play.api.{Application, Configuration, Mode, Logger}
 
 import scala.util.control.NonFatal
+import play.Logger.ALogger
 
 class HikariCPPlugin(app: Application) extends DBPlugin {
 
   lazy val databaseConfig = app.configuration.getConfig("db").getOrElse(Configuration.empty)
+  
+  lazy val logger : ALogger = play.Logger.of("com.edulify.play.hikaricp.HikariCPPlugin")
 
   override def enabled = true
 
@@ -33,7 +36,7 @@ class HikariCPPlugin(app: Application) extends DBPlugin {
   def api: DBApi = hirakiCPDBApi
 
   override def onStart() {
-    play.api.Logger.info("Starting HikariCP connection pool...")
+    Logger.info("Starting HikariCP connection pool...")
     hirakiCPDBApi.datasources.map { ds =>
         try {
           ds._1.getConnection.close()
@@ -50,7 +53,7 @@ class HikariCPPlugin(app: Application) extends DBPlugin {
   }
 
   override def onStop() {
-    play.api.Logger.info("Stoping HikariCP connection pool...")
+    Logger.info("Stoping HikariCP connection pool...")
     api.datasources.foreach {
       case (ds, _) => try {
         api.shutdownPool(ds)

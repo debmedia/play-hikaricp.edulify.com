@@ -17,14 +17,17 @@ package com.edulify.play.hikaricp
 
 import com.zaxxer.hikari.HikariDataSource
 
-import play.api.{Configuration, Logger}
+import play.api.{Configuration,Logger}
 import play.api.db.DBApi
 
 import javax.sql.DataSource
 import java.sql.{Driver, DriverManager}
+import play.Logger.ALogger
 
 class HirakiCPDBApi(configuration: Configuration, classloader: ClassLoader) extends DBApi {
 
+  lazy val logger : ALogger = play.Logger.of("com.edulify.play.hikaricp.HirakiCPDBApi")
+  
   lazy val dataSourceConfigs = configuration.subKeys.map {
     dataSourceName => dataSourceName -> configuration.getConfig(dataSourceName).getOrElse(Configuration.empty)
   }
@@ -37,7 +40,7 @@ class HirakiCPDBApi(configuration: Configuration, classloader: ClassLoader) exte
   }.toList
 
   def shutdownPool(ds: DataSource) = {
-    play.api.Logger.info("Shutting down connection pool.")
+    Logger.info("Shutting down connection pool.")
     ds match {
       case ds: HikariDataSource => ds.shutdown()
     }
