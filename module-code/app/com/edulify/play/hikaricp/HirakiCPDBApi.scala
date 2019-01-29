@@ -42,7 +42,7 @@ class HirakiCPDBApi(configuration: Configuration, classloader: ClassLoader) exte
   def shutdownPool(ds: DataSource) = {
     Logger.info("Shutting down connection pool.")
     ds match {
-      case ds: HikariDataSource => ds.shutdown()
+      case ds: HikariDataSource => ds.close()
     }
   }
 

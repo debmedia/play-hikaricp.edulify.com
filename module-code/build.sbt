@@ -2,11 +2,11 @@ import play.Project._
 
 name := "play-hirakicp"
 
-version := "1.2.1"
+version := "1.2.2"
 
 libraryDependencies ++= Seq(
   jdbc,
-  "com.zaxxer" % "HikariCP" % "1.3.8",
+  "com.zaxxer" % "HikariCP" % "3.3.0",
   "commons-configuration" % "commons-configuration" % "1.10",
   "commons-collections" % "commons-collections" % "3.2.1"
 )
